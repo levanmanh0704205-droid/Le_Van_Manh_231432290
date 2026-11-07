@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Giám sát báo cháy ESP32</title>
+<script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5fa;font:16px system-ui,Arial;color:#1c2939}
+main{max-width:1000px;margin:30px auto;padding:0 16px}h1{font-size:1.65rem}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
+.card{background:white;border-radius:14px;box-shadow:0 3px 18px #18304712;padding:22px}
+.value{font-size:2.4rem;font-weight:700;margin:12px 0}.small{color:#64748b;font-size:.86rem}
+button{padding:12px 20px;background:#2459ac;color:white;border:0;border-radius:9px;cursor:pointer;font-size:1rem}
+button:disabled{opacity:.5;cursor:not-allowed}.graph{height:240px}canvas{max-height:210px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>Giám sát báo cháy gia đình</h1>
+<p id="connection" class="small">Đang kết nối MQTT...</p>
+<section class="grid">
+ <div class="card"><strong>Nồng độ khí gas</strong><div class="value gas-value" id="gas">-- %</div><div class="small">Mức ADC tương đối (mô phỏng, không phải ppm)</div></div>
+ <div class="card"><strong>Nhiệt độ</strong><div class="value temperature-value" id="temperature">-- °C</div><div class="small">Cảm biến DHT22</div></div>
+ <div class="card"><strong>Biểu đồ khí gas</strong><div class="graph"><canvas id="gasChart"></canvas></div></div>
+ <div class="card"><strong>Biểu đồ nhiệt độ</strong><div class="graph"><canvas id="tempChart"></canvas></div></div>
+ <div class="card"><strong>Quạt</strong><p id="fanStatus">Trạng thái: --</p><p id="fanMode" class="small">Chế độ: AUTO</p><button id="fanBtn" disabled>Đổi chế độ quạt</button></div>
+ <div class="card"><strong>Máy bơm</strong><p id="pumpStatus">Trạng thái: --</p><p id="pumpMode" class="small">Chế độ: AUTO</p><button id="pumpBtn" disabled>Đổi chế độ bơm</button></div>
+</section>
+<p class="small">Nút chuyển tuần tự AUTO → ON → OFF → AUTO. AUTO dùng ngưỡng cảnh báo; ON và OFF là chế độ manual. Chỉ dùng cho mô phỏng học tập, không dùng thay hệ thống báo cháy đạt chuẩn.</p>
+</main>
+<script>
+const BASE='vn/demo/fire_7f29';
+const DATA=BASE+'/data', CMD=BASE+'/cmd';
+const client=mqtt.connect('wss://broker.emqx.io:8084/mqtt',{clientId:'web-fire-'+Math.random().toString(16).slice(2),reconnectPeriod:2000,connectTimeout:10000});
+const $=id=>document.getElementById(id);
+const modes={FAN:0,PUMP:0}, texts=['AUTO','ON','OFF'];
+const makeChart=(id,title,color)=>new Chart($(id),{type:'line',data:{labels:[],datasets:[{label:title,data:[],borderColor:color,tension:.25,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,animation:false,scales:{x:{ticks:{maxTicksLimit:7}}}}});
+const gasChart=makeChart('gasChart','Gas (%)','#e58d2c');
+const tempChart=makeChart('tempChart','Nhiệt độ (°C)','#d64b4b');
+function add(chart, value){const label=new Date().toLocaleTimeString('vi-VN');chart.data.labels.push(label);chart.data.datasets[0].data.push(value);if(chart.data.labels.length>30){chart.data.labels.shift();chart.data.datasets[0].data.shift()}chart.update('none')}
+client.on('connect',()=>{$('connection').textContent='MQTT đã kết nối – đang chờ dữ liệu từ ESP32';$('fanBtn').disabled=false;$('pumpBtn').disabled=false;client.subscribe(DATA)});
+client.on('reconnect',()=>{$('connection').textContent='Đang kết nối lại MQTT...'});
+client.on('offline',()=>{$('connection').textContent='MQTT mất kết nối';$('fanBtn').disabled=true;$('pumpBtn').disabled=true});
+client.on('error',err=>{$('connection').textContent='MQTT lỗi: '+err.message});
+client.on('message',(topic,raw)=>{if(topic!==DATA)return;try{const d=JSON.parse(raw.toString());if(typeof d.gas==='number'&&typeof d.temperature==='number'){$('gas').textContent=d.gas.toFixed(1)+' %';$('temperature').textContent=d.temperature.toFixed(1)+' °C';add(gasChart,d.gas);add(tempChart,d.temperature);$('connection').textContent='Đã cập nhật: '+new Date().toLocaleTimeString('vi-VN')}if(typeof d.fan==='boolean')$('fanStatus').textContent='Trạng thái: '+(d.fan?'BẬT':'TẮT');if(typeof d.pump==='boolean')$('pumpStatus').textContent='Trạng thái: '+(d.pump?'BẬT':'TẮT')}catch(e){console.warn('Invalid MQTT payload',e)}});
+function cycle(dev){if(!client.connected)return;modes[dev]=(modes[dev]+1)%3;const mode=texts[modes[dev]];client.publish(CMD,dev+'_'+mode,{qos:0});$(dev==='FAN'?'fanMode':'pumpMode').textContent='Chế độ: '+mode}
+$('fanBtn').addEventListener('click',()=>cycle('FAN'));
+$('pumpBtn').addEventListener('click',()=>cycle('PUMP'));
+</script></body></html>
