@@ -36,20 +36,12 @@ Dự án mô phỏng hệ thống báo cháy gia đình sử dụng ESP32, cảm
 5. Ở chế độ tự động: quạt bật khi mức khí gas vượt ngưỡng; máy bơm bật khi nhiệt độ vượt ngưỡng.
 6. Ở chế độ Manual: người dùng sử dụng hai nút trên Web để điều khiển quạt và máy bơm; chương trình cần có quy tắc ưu tiên chế độ điều khiển rõ ràng.
 
-Ngưỡng **minh họa**: khí gas 45% (giá trị ADC quy đổi, **không phải nồng độ khí gas đã hiệu chuẩn**) và nhiệt độ 45 °C. Đây không phải ngưỡng an toàn chuẩn.
-
 ## 6. Giao diện Web
 - Hai thẻ HTML sử dụng `class` hiển thị **nồng độ khí gas (giá trị minh họa)** và **nhiệt độ**.
 - Hai biểu đồ cập nhật theo thời gian thực (tùy chọn).
 - Hai nút `button` điều khiển **quạt** và **máy bơm** ở chế độ Manual.
 - Web cần kết nối với MQTT Broker qua MQTT over WebSocket nếu chạy trong trình duyệt.
 
-## 7. Đường dẫn mô phỏng và minh chứng
-- **Wokwi:** _Dán đường dẫn dự án Wokwi tại đây._
-- **Web Dashboard:** _Dán đường dẫn trang Web tại đây (nếu đã triển khai)._
-- **Ảnh kết quả:** _Bổ sung ảnh sơ đồ Wokwi, Serial Monitor và Dashboard vào thư mục `images/` rồi liên kết tại đây._
-
-## 8. Kết quả dự kiến và kết luận
+## 7. Kết quả dự kiến và kết luận
 Mô hình được thiết kế để giám sát dữ liệu cảm biến, truyền dữ liệu qua MQTT, và điều khiển quạt/bơm dựa trên ngưỡng cảnh báo hoặc lệnh Manual. Việc tổ chức ba Task FreeRTOS giúp tách biệt quá trình thu thập, truyền dữ liệu và cảnh báo. Cần chạy mô phỏng và lưu hình minh chứng để xác nhận kết quả thực tế.
 
-> **Lưu ý an toàn:** Đây là bài thực hành/mô phỏng IoT, không phải hệ thống báo cháy đạt chuẩn và không thay thế thiết bị phòng cháy chữa cháy thực tế.
