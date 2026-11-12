@@ -39,7 +39,7 @@ Dự án mô phỏng hệ thống báo cháy gia đình sử dụng ESP32, cảm
 ## 6. Giao diện Web
 - Hai thẻ HTML sử dụng `class` hiển thị **nồng độ khí gas (giá trị minh họa)** và **nhiệt độ**.
 - Hai biểu đồ cập nhật theo thời gian thực (tùy chọn).
-- Hai nút `button` điều khiển **quạt** và **máy bơm** ở chế độ Manual.
+- Hai nút điều khiển **quạt** và **máy bơm** ở chế độ Manual.
 - Web cần kết nối với MQTT Broker qua MQTT over WebSocket nếu chạy trong trình duyệt.
 
 ## 7. Kết quả dự kiến và kết luận
