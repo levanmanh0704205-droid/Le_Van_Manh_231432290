@@ -13,7 +13,7 @@ Dự án mô phỏng hệ thống báo cháy gia đình sử dụng ESP32, cảm
 ## 3. Kết nối phần cứng (mô phỏng)
 | Thiết bị | Kết nối ESP32 |
 |---|---|
-| MQ2 AO | GPIO34 |
+| MQ2    | GPIO34 |
 | DHT22 DATA | GPIO4 |
 | LED quạt | GPIO18 (qua điện trở 220 Ω) |
 | LED máy bơm | GPIO19 (qua điện trở 220 Ω) |
