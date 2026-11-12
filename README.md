@@ -17,4 +17,5 @@ biến nhiệt, hiển thị dữ liệu qua giao tiếp serial, gửi dữ li�
 “data Queue” và vào hàng đợi “data Alert”
 + “Tast cảnh báo”, chạy Core 1: đọc dữ liệu tử hàng đợi “data Alert” , và thực
 hiện điều khiển cơ cấu chấp hành là quạt và máy bơm. Quạt bật khi nồng độ khí
-gas vượt ngưỡng, Máy bơm bật khi nhiệt độ vượt ngưỡng.
+gas vượt ngưỡng, Máy bơm bật khi nhiệt độ vượt ngưỡng.<img width="385" height="308" alt="image" src="https://github.com/user-attachments/assets/661a2cd6-a07a-4dcc-9f8e-83ec33302b21" />
+
